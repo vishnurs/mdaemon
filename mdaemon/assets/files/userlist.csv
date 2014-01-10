@@ -1,0 +1,4 @@
+Domain,Mailbox,FullName,MailDir,Password,AutoDecode,IsForwarding,AccessType,AllowChangeViaEmail,KeepForwardedMail,HideFromEveryone,ProcessCalendarRequests,ApplyQuotas,EnableMultiPOP,LocalOnly,MaxDiskSpace,MaxMessageCount,CR,LF
+company.mail,Mdaemon,MDaemon Server,C:\MDaemon\Users\company.mail\MDaemon\,ipyIa+qYy6ihluDG,N,N,N,N,Y,N,N,N,N,N,0,0,0,0
+company.mail,Vishnu,Vishnu V,C:\MDaemon\Users\company.mail\vishnu\,hZqYhdfI7O/K,N,N,N,N,Y,N,N,N,N,N,0,0,0,0
+company.mail,Vishnu.test,Vishnu test,C:\MDaemon\Users\company.mail\Vishnu.test\,qtHYiOHaq6yn,N,N,N,N,Y,N,N,N,N,N,0,0,0,0
