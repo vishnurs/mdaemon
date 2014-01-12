@@ -29,7 +29,7 @@ if(isset($_POST['sendmail'])) {
 		}
 	}
 }
-if(!isset($_GET['u']) || !isset($_GET['p'])) {
+if(!isset($_POST['sendmail']) && (!isset($_GET['u']) || !isset($_GET['p']))) {
 	die("Looks like you are URL is broken");
 }
 

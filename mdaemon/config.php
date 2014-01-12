@@ -9,7 +9,7 @@ error_reporting(-1);
 $accountfilename = 'assets/files/userlist1.csv';
 $adminemail = '';
 //$passemail = '';
-$passkey = 'usemeforencrption';
+$passkey = 'usemeforencrption'; 
 
 /* Database variables*/
 
