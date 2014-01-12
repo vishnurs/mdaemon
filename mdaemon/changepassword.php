@@ -26,7 +26,7 @@ if(isset($_POST['sendmail'])) {
 		}
 	}
 }
-if(!isset($_GET['email']) || !isset($_GET['password'])) {
+if(!isset($_GET['u']) || !isset($_GET['p'])) {
 	die("Looks like you are URL is broken");
 }
 
@@ -42,11 +42,12 @@ $password = filter_var($_GET['p'], FILTER_SANITIZE_STRING);
 	<input type="hidden" name="oldpassword" id="" value="<?php $password ?>" />
 	<input type="text" class="form-control" placeholder="New Password" id="pw" /><br />
 	<input type="text" class="form-control" placeholder="New Password" id="cpw" name="newpassword"/><br />
-	<input type="submit" class="btn btn-primary" value="Submit" name ="sendmail" />
+	<input type="submit" class="btn btn-primary" value="Submit" name ="sendmail" id="sendmail" />
 	</form>
 </div>
 <script>
 $(function() {
+	$("#sendmail").click(function() {
 	p1 = $("#pw").val();
 	p2 = $("#cpw").val();
 	if(!p1 || !p2) {
@@ -57,6 +58,7 @@ $(function() {
 		alert("Your passwords don't match");
 		return false;
 	}
+	})
 })	
 </script>
 
