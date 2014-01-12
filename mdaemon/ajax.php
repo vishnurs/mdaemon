@@ -42,6 +42,7 @@ while(!feof($file))
 }
 fclose($file);
 $i = 0;
+$error = 0;
 $date = date("Y-m-d H:i:s");
 foreach($csv_file as $csv) {
 	if($csv)
@@ -116,6 +117,11 @@ foreach($email_array as $e) {
 			}	
 		}*/
 	}
+	else {
+
+		echo "Mailer ERROR ".$mail->ErrorInfo."<br />";
+		$error = 1;
+	}
 }
 
 $result  = $con->query("SELECT * FROM accounts");
@@ -131,10 +137,13 @@ fclose($handle);
 if(unlink($filename)) {
 	rename($temp_file, $filename);
 	if(!isset($_POST['ajax']) && !$_POST['ajax'] == 1) {
-	?>
+	if($error) {
+		die();	
+	}
+	else {?>
 	<script>window.location.href = 'userlist.php'</script>
 	<?php
-	}
+	}}
 	else {
 		echo date("Y-m-d H:i:s");
 		die();
