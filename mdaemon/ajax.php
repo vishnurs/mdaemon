@@ -63,8 +63,11 @@ foreach($csv_file as $csv) {
 //die();
 $mail = new PHPMailer;
 $mail->isSMTP(true); 
-$mail->Host = 'localhost';
-$mail->SMTPAuth = false;
+$mail->Host = $emailhost;
+$mail->SMTPAuth = true;
+$mail->Username   = $adminemail; // SMTP account username
+$mail->Password   = $passemail;  // SMTP account password
+
 $mail->setFrom($adminemail);
 $mail->Port = 587;
 $mail->isHTML(true); 

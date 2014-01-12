@@ -7,8 +7,11 @@ error_reporting(-1);
 
 
 $accountfilename = 'assets/files/userlist1.csv';
-$adminemail = '';
-//$passemail = '';
+
+/*** EMAIL settings ***/
+$emailhost = '';
+$adminemail = ''; // Email address to send mails from
+$passemail = ''; // Email Password
 $passkey = 'usemeforencrption'; 
 
 /* Database variables*/
