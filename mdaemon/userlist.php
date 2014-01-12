@@ -70,7 +70,13 @@ while(!feof($file))
 					<td><?php echo $csv[1]; ?></td>
 					<td><?php echo $preqdate; ?></td>
 					<td><?php echo $pchangedate; ?></td>	
-					<td style="background-color:<?php if($status == "1") echo '#FFFF70'; else echo '#8BD68B'  ?>" ></td>
+					<td style="background-color:<?php if($status == "1") echo '#FFFF70'; else echo '#8BD68B'  ?>" >
+						<?php if($status == "1") {
+							echo "Request Send";
+						} else {
+							echo "Password Changed";
+						}?>
+					</td>
 					<td style="width:100px;">
 						<input type="button" class="btn btn-primary sendbtn" value="Send" /><img src="assets/images/loading.gif" width="20px" height="20px" class="hide">
 					</td>

@@ -1,5 +1,6 @@
 <?php 
 
+/*** DEVELOPMENT MODE **/
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(-1);
@@ -17,7 +18,7 @@ $password = "";
 $database = "";
 $host = "localhost";
 
-$pass_change_link = ""; //path to the changepassword.php file with trailing '/'
+$pass_change_link = "http://dev.vishnurs.com/changepassword.php/"; //path to the changepassword.php file with trailing '/'
 $pass_change_mail = "mdaemon@mydomain.it";
 
 
