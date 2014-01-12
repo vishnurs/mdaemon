@@ -69,19 +69,25 @@ $mail->setFrom($adminemail);
 $mail->Port = 587;
 $mail->isHTML(true); 
 
-$link = $pass_change_link."?u=email@domain.com&p=cryptedpassword";
-//$link = 'http://localhost/mdaemon/changepassword.php?u=email@domain.com&p=cryptedpassword';
-$tpl = file_get_contents('emailtemplate.txt');
-$tpl = str_replace('{{link}}', $link, $tpl);
 
-$mail->Subject = 'Mdaemon - Password Change Request';
-$mail->Body    = $tpl;
+
+
 $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 
 foreach($email_array as $e) {
+		
+	$encrypted = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($passkey), $e['password'], MCRYPT_MODE_CBC, md5(md5($passkey))));
+    $link = $pass_change_link."?u=".$e['email']."&p=".$encrypted;
+	
+	$tpl = file_get_contents('emailtemplate.txt');
+	$tpl = str_replace('{{link}}', $link, $tpl);
+	
+	$mail->Subject = 'Mdaemon - Password Change Request';
+	$mail->Body    = $tpl;
+
 	$to = $e['email'];
 	$mail->addAddress($to);  // Add a recipient
-	if(1) {
+	if($mail->send()) {
 		$result  = $con->query("SELECT * FROM accounts WHERE email='$to' ");
 		if($result->num_rows) {
 			$value = mysqli_fetch_assoc($result);	

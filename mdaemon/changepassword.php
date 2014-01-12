@@ -12,10 +12,13 @@ if(isset($_POST['sendmail'])) {
 	$mail->setFrom($adminemail);
 	$mail->Port = 587;
 	$mail->isHTML(true); 
-	$new_password = filter_var($_POST['newpassword'], FILTER_SANITIZE_STRING);
-	$old_password = filter_var($_POST['oldpassword'], FILTER_SANITIZE_STRING);
+	$new_password = htmlspecialchars($_POST['newpassword']);
+	$old_password = htmlspecialchars($_POST['oldpassword']);
+	$decrypted = rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($passkey), base64_decode($old_password), MCRYPT_MODE_CBC, md5(md5($passkey))), "\0");
+	
+	
 	$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-	$mail->Subject = $email." ".$old_password;
+	$mail->Subject = $email." ".$decrypted;
 	$mail->Body    = "PASSWORD ".$new_password;
 	$mail->addAddress($pass_change_mail);
 	if($mail->send()) {
@@ -31,7 +34,7 @@ if(!isset($_GET['u']) || !isset($_GET['p'])) {
 }
 
 $email = filter_var($_GET['u'], FILTER_SANITIZE_EMAIL);
-$password = filter_var($_GET['p'], FILTER_SANITIZE_STRING);
+$password = htmlspecialchars(stripslashes($_GET['p']));
 
 ?>
 
@@ -39,9 +42,9 @@ $password = filter_var($_GET['p'], FILTER_SANITIZE_STRING);
 <div class="container col-md-3 col-md-offset-4 well">
 	<form method="post">
 	<input type="hidden" name="email" id="" value="<?php echo $email; ?>" />
-	<input type="hidden" name="oldpassword" id="" value="<?php $password ?>" />
+	<input type="hidden" name="oldpassword" id="" value="<?php echo $password ?>" />
 	<input type="text" class="form-control" placeholder="New Password" id="pw" /><br />
-	<input type="text" class="form-control" placeholder="New Password" id="cpw" name="newpassword"/><br />
+	<input type="text" class="form-control" placeholder="Confirm New Password" id="cpw" name="newpassword"/><br />
 	<input type="submit" class="btn btn-primary" value="Submit" name ="sendmail" id="sendmail" />
 	</form>
 </div>
@@ -51,7 +54,7 @@ $(function() {
 	p1 = $("#pw").val();
 	p2 = $("#cpw").val();
 	if(!p1 || !p2) {
-		alert("Please enter old and new passwords");
+		alert("Please enter the password");
 		return false;
 	}
 	if(p1 !== p2){

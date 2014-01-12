@@ -7,9 +7,9 @@ error_reporting(-1);
 
 
 $accountfilename = 'assets/files/userlist1.csv';
-$adminemail = 'vishnusince1990@gmail.com';
+$adminemail = '';
 //$passemail = '';
-//$key = '';
+$passkey = 'usemeforencrption';
 
 /* Database variables*/
 
