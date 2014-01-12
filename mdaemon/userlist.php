@@ -19,10 +19,7 @@ while(!feof($file))
 	}
 	$i++;	
 }
-//echo "<pre>";
-//$r = explode(" ", $csv_file);
-//print_r($r);die();
-//print_r($csv_file);
+
 ?>
 <div class="container">
 	<div class="row">
@@ -43,11 +40,26 @@ while(!feof($file))
 						<th>UserName</th>
 						<th>Date of Email Change Request</th>
 						<th>Date of Last Password Change</th>
-						<th>Icon</th>
+						<th>Status</th>
 						<th>Send</th>	
 					</thead>
 					
-					<?php foreach($csv_file as $csv) { if($csv) {?>
+					<?php foreach($csv_file as $csv) {
+						 if($csv) {
+						 	
+						 	$result = mysqli_query($con, "SELECT preqdate,pchangedate,status FROM accounts WHERE email='$csv[0]'");
+							if($result->num_rows) {
+								$row = mysqli_fetch_array($result);
+								
+								
+								$preqdate = $row['preqdate'];
+								$pchangedate = $row['pchangedate'];
+								$status = $row['status'];
+							} else {
+								$preqdate = "";
+								$pchangedate = "";
+							}
+					?>
 					<tr>
 					<td>
 						<input type="checkbox" class="check" name="<?php echo $csv[1]; ?>" value="<?php echo $csv[1]; ?>" />
@@ -56,9 +68,9 @@ while(!feof($file))
 					</td>
 					<td><?php echo $csv[0]; ?></td>
 					<td><?php echo $csv[1]; ?></td>
-					<td><?php ?></td>
-					<td><?php ?></td>	
-					<td></td>
+					<td><?php echo $preqdate; ?></td>
+					<td><?php echo $pchangedate; ?></td>	
+					<td style="background-color:<?php if($status == "1") echo '#FFFF70'; else echo '#8BD68B'  ?>" ></td>
 					<td style="width:100px;">
 						<input type="button" class="btn btn-primary sendbtn" value="Send" /><img src="assets/images/loading.gif" width="20px" height="20px" class="hide">
 					</td>
@@ -108,21 +120,21 @@ while(!feof($file))
  		$("#tbl1_filter").addClass("pull-left");
  		$(".sendbtn").click(function() {
  			$(this).next().removeClass("hide");
- 			val = $(this).parent().parent().children().eq(1).text();
- 			$(this).children().eq(0).removeClass("hide");
+ 			email = $(this).parent().parent().children().eq(1).text();
+ 			username = $(this).parent().parent().children().eq(2).text();
+ 			password = $(this).parent().parent().children().eq(3).text();
+ 			$(this).next().removeClass("hide").addClass("active_load");
  			
 			
-			$.post( "ajax.php", {ajax:"1",addr: val }, function(response) {
+			$.post( "ajax.php", {ajax:"1",email: email, username:username,password:password }, function(response) {
 				
-				$(this).children().eq(0).addClass("hide");
-				if(response == "success") {
-					$(this).next().addClass("hide")
-				  	$("#info").html("Comments removed successfully");
-				  	$("#danger").html("");
+				$(this).next().addClass("hide");
+				if(response != "fail") {
+					$(".active_load").parent().parent().children().eq(3).text(response);
+					$(".active_load").addClass("hide").removeClass("active_load");
 				}
 				else{
-					$("#info").html("");
-					$("#danger").html("There is an unexpected error");
+					
 				}
 			});
  		})

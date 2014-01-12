@@ -4,7 +4,9 @@ $con = mysqli_connect($host, $username, $password, $database);
 
 
 if(isset($_POST['ajax']) && $_POST['ajax'] == 1) {
-	$email_array = array($_POST['addr']);
+	$email_array[0]['username'] = $_POST['username'];
+	$email_array[0]['email'] = $_POST['email'];
+	$email_array[0]['password'] = $_POST['password'];
 }
 else {
 	$i = 0;
@@ -22,7 +24,7 @@ else {
 	}	
 } 
 
-
+//print_r($email_array);die();
 require_once("assets/PHPMailer/PHPMailerAutoload.php");
 
 
@@ -42,19 +44,18 @@ fclose($file);
 $i = 0;
 $date = date("Y-m-d H:i:s");
 foreach($csv_file as $csv) {
-	//print_r($csv);echo "<br />";
-	echo "<script>alert('".strlen($csv[0])."')</script>";
-	if(in_array("email", $csv) || !strlen($csv[0])) {
+	if($csv)
+	if(in_array("email", $csv)) {
 		
 	}
 	else {	
 		$result  = $con->query("SELECT id FROM accounts WHERE email='$csv[0]'");
-	//echo $result->num_rows;die();
 		if(!$result->num_rows) {
 			mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$csv[0]','$csv[1]','$csv[2]','$date')");	
 		} else {
-			$value = mysqli_fetch_assoc($result);	
-			mysqli_query($con, "UPDATE accounts SET preqdate='$date' WHERE id='$value[id]'");
+			
+			//$value = mysqli_fetch_assoc($result);	
+			//mysqli_query($con, "UPDATE accounts SET preqdate='$date' WHERE id='$value[id]'");
 		}	
 	}
 }
@@ -68,8 +69,8 @@ $mail->setFrom($adminemail);
 $mail->Port = 587;
 $mail->isHTML(true); 
 
-
-$link = 'http://localhost/mdaemon/changepassword.php?u=email@domain.com&p=cryptedpassword';
+$link = $pass_change_link."?u=email@domain.com&p=cryptedpassword";
+//$link = 'http://localhost/mdaemon/changepassword.php?u=email@domain.com&p=cryptedpassword';
 $tpl = file_get_contents('emailtemplate.txt');
 $tpl = str_replace('{{link}}', $link, $tpl);
 
@@ -80,18 +81,18 @@ $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
 foreach($email_array as $e) {
 	$to = $e['email'];
 	$mail->addAddress($to);  // Add a recipient
-	if($mail->send()) {
+	if(1) {
 		$result  = $con->query("SELECT * FROM accounts WHERE email='$to' ");
 		if($result->num_rows) {
 			$value = mysqli_fetch_assoc($result);	
-			print_r($value);
-			mysqli_query($con, "UPDATE accounts SET preqdate='$date' WHERE id='$value[id]'");
+			//print_r($value);
+			mysqli_query($con, "UPDATE accounts SET preqdate='$date', status=1 WHERE id='$value[id]'");
 		}
 		else {
 			$email = $e['email'];
 				$username = $e['username'];
 				$password = $e['password'];
-				mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$email','$username','$password','$date')");
+				mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate,status) VALUES('$email','$username','$password','$date','1')");
 		}
 		/*while($value = mysqli_fetch_row($result)) {
 			//print_r($value);die();	
@@ -120,11 +121,15 @@ while($row = mysqli_fetch_row($result)) {
 fclose($handle);
 if(unlink($filename)) {
 	rename($temp_file, $filename);
+	if(!isset($_POST['ajax']) && !$_POST['ajax'] == 1) {
 	?>
 	<script>window.location.href = 'userlist.php'</script>
 	<?php
-	//header("Location: userlist.php");
-	die();
+	}
+	else {
+		echo date("Y-m-d H:i:s");
+		die();
+	}
 }
 
 

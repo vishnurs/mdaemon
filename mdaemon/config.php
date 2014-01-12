@@ -6,9 +6,9 @@ error_reporting(-1);
 
 
 $accountfilename = 'assets/files/userlist1.csv';
-$adminemail = '';
-$passemail = '';
-$key = '';
+$adminemail = 'vishnusince1990@gmail.com';
+//$passemail = '';
+//$key = '';
 
 /* Database variables*/
 
@@ -17,7 +17,9 @@ $password = "";
 $database = "";
 $host = "localhost";
 
-$link = ""; //link mentioned in the mail
+$pass_change_link = ""; //path to the changepassword.php file with trailing '/'
+$pass_change_mail = "mdaemon@mydomain.it";
+
 
 $con = mysqli_connect($host, $username, $password, $database);
 

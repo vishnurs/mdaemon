@@ -1,0 +1,1 @@
+TABLE accounts(id int UNIQUE AUTO INCREMENT, email text, username text, password text, preqdate datetime, pchangedate datetime,status text)

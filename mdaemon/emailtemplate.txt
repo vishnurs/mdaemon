@@ -1,0 +1,3 @@
+Please change your password by clicking this link <br />
+<a href="{{link}}">{{link}}</a><br />
+Thank You
