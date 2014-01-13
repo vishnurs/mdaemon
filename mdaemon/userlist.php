@@ -137,12 +137,15 @@ while(!feof($file))
 			$.post( "ajax.php", {ajax:"1",email: email, username:username,password:password }, function(response) {
 				
 				$(this).next().addClass("hide");
-				if(response != "fail") {
-					$(".active_load").parent().parent().children().eq(3).text(response);
+				if(response == "success") {
+					alert("Password Change Request send");
+					//$(".active_load").parent().parent().children().eq(3).text(response);
+					$(".active_load").parent().parent().children().eq(5).text("Request Send");
+					$(".active_load").parent().parent().children().eq(5).css("background-color","#FFFF70");
 					$(".active_load").addClass("hide").removeClass("active_load");
 				}
 				else{
-					
+					alert(response);
 				}
 			});
  		})

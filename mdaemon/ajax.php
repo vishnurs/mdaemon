@@ -119,7 +119,7 @@ foreach($email_array as $e) {
 	}
 	else {
 
-		echo "Mailer ERROR ".$mail->ErrorInfo."<br />";
+		//echo "Mailer ERROR ".$mail->ErrorInfo."<br />";
 		$error = 1;
 	}
 }
@@ -130,23 +130,27 @@ while($row = mysqli_fetch_row($result)) {
 	unset($row[0]);
 	if($row) {
 		fputcsv($handle, $row);	
-	}
-	
+	}	
 }
+
 fclose($handle);
 if(unlink($filename)) {
 	rename($temp_file, $filename);
 	if(!isset($_POST['ajax']) && !$_POST['ajax'] == 1) {
-	if($error) {
-		die();	
-	}
-	else {?>
+	?>
 	<script>window.location.href = 'userlist.php'</script>
 	<?php
-	}}
+	}
 	else {
-		echo date("Y-m-d H:i:s");
-		die();
+		if($error) {
+			echo $mail->ErrorInfo;
+			die();	
+		}
+		else {
+			//echo date("Y-m-d H:i:s");
+			echo "success";
+			die();
+		}
 	}
 }
 
