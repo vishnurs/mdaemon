@@ -9,15 +9,36 @@ $strings = file_get_contents($accountfilename);
 $file = fopen($accountfilename,"r");
 
 $i = 0;
-while(!feof($file))
-{
-	if($i != 0)	{
-		$csv_file[] =fgetcsv($file);	
+while (($buffer = fgets($file, 40960)) !== false) {
+    $buffer = preg_replace('/(\\\",)/','\\ ",',$buffer); // to handle triling slash problem
+    $buffer = preg_replace('/(\\\"("?),)/',' ',$buffer);
+    $csv_file[] = str_getcsv($buffer);
+}
+if (!feof($file)) {
+    echo "Error: unexpected fgets() fail\n";
+}
+fclose($file);
+
+
+/**Write everything DB **/
+
+foreach($csv_file as $csv) {
+	if($csv[0]) {
+	if(!in_array("Email", $csv)) {
+		
+		$result  = $con->query("SELECT id FROM accounts WHERE email='$csv[0]'");
+		if(!$result->num_rows) {
+			
+			mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$csv[0]','$csv[3]','$csv[5]','')");	
+		}
+		else {
+		//print_r($csv[4]);die("oo");
+		$value = mysqli_fetch_assoc($result);
+		//echo "UPDATE accounts SET email='$csv[0]',username='$csv[3]',password='$csv[5]' WHERE id='$value[id]'";
+			mysqli_query($con, "UPDATE accounts SET email='$csv[0]',username='$csv[3]',password='$csv[5]' WHERE id='$value[id]'");
+		}
 	}
-	else {
-		fgetcsv($file);
 	}
-	$i++;	
 }
 
 ?>
@@ -37,7 +58,7 @@ while(!feof($file))
 					<thead>
 						<th><input type="checkbox" id="all_check" class="check"/></th>
 						<th>Email</th>
-						<th>UserName</th>
+						<th style="width: 124px;">UserName</th>
 						<th>Date of Email Change Request</th>
 						<th>Date of Last Password Change</th>
 						<th>Status</th>
@@ -45,6 +66,8 @@ while(!feof($file))
 					</thead>
 					
 					<?php foreach($csv_file as $csv) {
+						if($i == 0 ) { $i=1;continue;  }
+						$status = "";
 						 if($csv) {
 						 	
 						 	$result = mysqli_query($con, "SELECT preqdate,pchangedate,status FROM accounts WHERE email='$csv[0]'");
@@ -62,12 +85,15 @@ while(!feof($file))
 					?>
 					<tr>
 					<td>
-						<input type="checkbox" class="check" name="<?php echo $csv[1]; ?>" value="<?php echo $csv[1]; ?>" />
-						<input type="hidden" name="<?php echo $csv[1] ?>-email" value="<?php echo $csv[0] ?>" />
-						<input type="hidden" name="<?php echo $csv[1] ?>-pass" value="<?php echo $csv[2] ?>"  />
+						<input type="checkbox" class="check" name="<?php echo $csv[3]; ?>" />
+						<input type="hidden" name="<?php echo $csv[3] ?>-email" value="<?php echo $csv[0] ?>" />
+						<input type="hidden" name="<?php echo $csv[3] ?>-pass" value="<?php echo $csv[5] ?>"  />
+						<!--<input type="hidden" name="<?php echo $csv[0] ?>-email" value="<?php echo $csv[0] ?>" />
+						<input type="hidden" name="<?php echo $csv[5] ?>-pass" value="<?php echo $csv[5] ?>"  />-->
 					</td>
 					<td><?php echo $csv[0]; ?></td>
-					<td><?php echo $csv[1]; ?></td>
+					<td><?php echo $csv[3]; ?> </td>
+					<!--<td style="display:none"><?php echo $csv ?></td>-->
 					<td><?php echo $preqdate; ?></td>
 					<td><?php echo $pchangedate; ?></td>	
 					<td style="background-color:<?php if($status == "1") echo '#FFFF70'; else if($status == "0") echo '#8BD68B'  ?>" >
@@ -81,6 +107,7 @@ while(!feof($file))
 					</td>
 					<td style="width:100px;">
 						<input type="button" class="btn btn-primary sendbtn" value="Send" /><img src="assets/images/loading.gif" width="20px" height="20px" class="hide">
+						<input type="hidden" value="<?php echo $csv[5] ?>" />
 					</td>
 					</tr>
 					<?php } }?>
@@ -130,7 +157,8 @@ while(!feof($file))
  			$(this).next().removeClass("hide");
  			email = $(this).parent().parent().children().eq(1).text();
  			username = $(this).parent().parent().children().eq(2).text();
- 			password = $(this).parent().parent().children().eq(3).text();
+ 			password = $(this).next().next().val();
+
  			$(this).next().removeClass("hide").addClass("active_load");
  			
 			
@@ -145,6 +173,7 @@ while(!feof($file))
 					$(".active_load").addClass("hide").removeClass("active_load");
 				}
 				else{
+					$(".active_load").addClass("hide").removeClass("active_load");
 					alert(response);
 				}
 			});

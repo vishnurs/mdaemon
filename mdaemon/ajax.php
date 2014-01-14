@@ -2,7 +2,7 @@
 require_once("config.php");
 $con = mysqli_connect($host, $username, $password, $database);
 
-
+//print_r($_POST);die();
 if(isset($_POST['ajax']) && $_POST['ajax'] == 1) {
 	$email_array[0]['username'] = $_POST['username'];
 	$email_array[0]['email'] = $_POST['email'];
@@ -11,14 +11,17 @@ if(isset($_POST['ajax']) && $_POST['ajax'] == 1) {
 else {
 	$i = 0;
 	foreach ($_POST as $key=>$value) {
-		
+		echo "inside";
 		if($key != "tbl1_length") {
-			if($key == $value) {
-				$email_array[$i]['username'] = $_POST[$value];
-				$email_array[$i]['email'] = $_POST[$value."-email"];
-				$email_array[$i]['password'] = $_POST[$value."-pass"];
-				$i++;	
-			}
+			//if($key == $value) {
+				if($value == "on") {
+					$email_array[$i]['username'] = $key;
+					$email_array[$i]['email'] = $_POST[$key."-email"];
+					$email_array[$i]['password'] = $_POST[$key."-pass"];
+					$i++;	
+				}
+					
+			//}
 			
 		}
 	}	
@@ -30,10 +33,10 @@ require_once("assets/PHPMailer/PHPMailerAutoload.php");
 
 /*******************************/
 $filename = "assets/files/accounts.csv";
-$temp_file = "assets/files/acc_new.csv";
+//$temp_file = "assets/files/acc_new.csv";
 /*******************************/
 
-
+/*
 $file = fopen($filename, 'r+');
 
 while(!feof($file))
@@ -46,13 +49,13 @@ $error = 0;
 $date = date("Y-m-d H:i:s");
 foreach($csv_file as $csv) {
 	if($csv)
-	if(in_array("email", $csv)) {
+	if(in_array("Email", $csv)) {
 		
 	}
 	else {	
 		$result  = $con->query("SELECT id FROM accounts WHERE email='$csv[0]'");
 		if(!$result->num_rows) {
-			mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$csv[0]','$csv[1]','$csv[2]','$date')");	
+			mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$csv[0]','$csv[3]','$csv[5]','$date')");	
 		} else {
 			
 			//$value = mysqli_fetch_assoc($result);	
@@ -60,11 +63,14 @@ foreach($csv_file as $csv) {
 		}	
 	}
 }
-
+*/
 //die();
+$error = 0;
+$date = date("Y-m-d H:i:s");
 $mail = new PHPMailer;
 $mail->isSMTP(true); 
 $mail->Host = $emailhost;
+//$mail->SMTPAuth = false;
 $mail->SMTPAuth = true;
 $mail->Username   = $adminemail; // SMTP account username
 $mail->Password   = $passemail;  // SMTP account password
@@ -123,8 +129,27 @@ foreach($email_array as $e) {
 		$error = 1;
 	}
 }
+//die("end");
 
-$result  = $con->query("SELECT * FROM accounts");
+if(!isset($_POST['ajax']) && !$_POST['ajax'] == 1) { // Error messgaes are not showed for non ajax requests
+	?>
+	<script>window.location.href = 'userlist.php'</script>
+	<?php
+}
+else {
+	if($error) {
+		echo $mail->ErrorInfo;
+		die();	
+	}
+	else {
+		//echo date("Y-m-d H:i:s");
+		echo "success";
+		die();
+	}
+}
+
+
+/*$result  = $con->query("SELECT * FROM accounts");
 $handle = fopen($temp_file, 'a');
 while($row = mysqli_fetch_row($result)) {
 	unset($row[0]);
@@ -132,6 +157,7 @@ while($row = mysqli_fetch_row($result)) {
 		fputcsv($handle, $row);	
 	}	
 }
+
 
 fclose($handle);
 if(unlink($filename)) {
@@ -153,7 +179,7 @@ if(unlink($filename)) {
 		}
 	}
 }
-
+*/
 
 
 ?>

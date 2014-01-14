@@ -1,8 +1,16 @@
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+
 <?php
-
-include_once("includes.php");
+$date = date("Y-m-d H:i:s");
+//include_once("includes.php");
 require_once("config.php");
-
+$flag = 0;
 if(isset($_POST['sendmail'])) {
 	require_once("assets/PHPMailer/PHPMailerAutoload.php");
 	$mail = new PHPMailer;
@@ -27,6 +35,7 @@ if(isset($_POST['sendmail'])) {
 			$value = mysqli_fetch_assoc($result);	
 			mysqli_query($con, "UPDATE accounts SET pchangedate='$date', status=0 WHERE id='$value[id]'");
 		}
+		$flag = 1;
 	}
 }
 if(!isset($_POST['sendmail']) && (!isset($_GET['u']) || !isset($_GET['p']))) {
@@ -36,10 +45,15 @@ if(!isset($_POST['sendmail']) && (!isset($_GET['u']) || !isset($_GET['p']))) {
 $email = filter_var($_GET['u'], FILTER_SANITIZE_EMAIL);
 $password = htmlspecialchars(stripslashes($_GET['p']));
 
+
 ?>
 
 <br /><br /><br /><br />
+
 <div class="container col-md-3 col-md-offset-4 well">
+	<div class="alert alert-info <?php if($flag != 1) echo "hide" ?>">
+		Password Change request Send
+	</div>
 	<form method="post">
 	<input type="hidden" name="email" id="" value="<?php echo $email; ?>" />
 	<input type="hidden" name="oldpassword" id="" value="<?php echo $password ?>" />
