@@ -8,6 +8,7 @@ error_reporting(-1);
 
 //$accountfilename = 'assets/files/userlist1.csv';
 $accountfilename = 'assets/files/accounts1.csv';
+
 /*** EMAIL settings ***/
 $emailhost = '';
 $adminemail = ''; // Email address to send mails from
@@ -21,7 +22,9 @@ $password = "";
 $database = "";
 $host = "localhost";
 
-$pass_change_link = "http://dev.vishnurs.com/changepassword.php/"; //path to the changepassword.php file with trailing '/'
+//$change_password_email_host = "localhost"; // email host in changepassword.php
+
+$pass_change_link = "http://dev.vishnurs.com/mdaemon/changepassword.php/"; //path to the changepassword.php file with trailing '/'
 $pass_change_mail = "mdaemon@pizzaitaliastorre.it"; // Email id to which password change request is send.
 
 

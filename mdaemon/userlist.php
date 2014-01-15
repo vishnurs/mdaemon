@@ -6,39 +6,43 @@ require_once("config.php");
 $strings = file_get_contents($accountfilename);
 
 
-$file = fopen($accountfilename,"r");
+
 
 $i = 0;
-while (($buffer = fgets($file, 40960)) !== false) {
-    $buffer = preg_replace('/(\\\",)/','\\ ",',$buffer); // to handle triling slash problem
-    $buffer = preg_replace('/(\\\"("?),)/',' ',$buffer);
-    $csv_file[] = str_getcsv($buffer);
-}
-if (!feof($file)) {
-    echo "Error: unexpected fgets() fail\n";
-}
-fclose($file);
-
-
-/**Write everything DB **/
-
-foreach($csv_file as $csv) {
-	if($csv[0]) {
-	if(!in_array("Email", $csv)) {
-		
-		$result  = $con->query("SELECT id FROM accounts WHERE email='$csv[0]'");
-		if(!$result->num_rows) {
-			
-			mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$csv[0]','$csv[3]','$csv[5]','')");	
-		}
-		else {
-		//print_r($csv[4]);die("oo");
-		$value = mysqli_fetch_assoc($result);
-		//echo "UPDATE accounts SET email='$csv[0]',username='$csv[3]',password='$csv[5]' WHERE id='$value[id]'";
-			mysqli_query($con, "UPDATE accounts SET email='$csv[0]',username='$csv[3]',password='$csv[5]' WHERE id='$value[id]'");
+if(isset($_POST['refresh'])) {
+	$file = fopen($accountfilename,"r");
+	while (($buffer = fgets($file, 40960)) !== false) {
+	    $buffer = preg_replace('/(\\\",)/','\\ ",',$buffer); // to handle triling slash problem
+	    $buffer = preg_replace('/(\\\"("?),)/',' ',$buffer);
+	    $csv_file[] = str_getcsv($buffer);
+	}
+	if (!feof($file)) {
+	    echo "Error: unexpected fgets() fail\n";
+	}
+	fclose($file);
+	
+	
+	/**Write everything DB **/
+	
+	foreach($csv_file as $csv) {
+		if($csv[0]) {
+			if(!in_array("Email", $csv)) {
+				
+				$result  = $con->query("SELECT id FROM accounts WHERE email='$csv[0]'");
+				if(!$result->num_rows) {
+					
+					mysqli_query($con,"INSERT INTO accounts(email,username,password,preqdate) VALUES('$csv[0]','$csv[3]','$csv[5]','')");	
+				}
+				else {
+				//print_r($csv[4]);die("oo");
+				$value = mysqli_fetch_assoc($result);
+				//echo "UPDATE accounts SET email='$csv[0]',username='$csv[3]',password='$csv[5]' WHERE id='$value[id]'";
+					mysqli_query($con, "UPDATE accounts SET email='$csv[0]',username='$csv[3]',password='$csv[5]' WHERE id='$value[id]'");
+				}
+			}
 		}
 	}
-	}
+	
 }
 
 ?>
@@ -53,6 +57,7 @@ foreach($csv_file as $csv) {
 	<br /><br /><br /><br />
 	<div class="row">
 		<div class="col-md-12">
+			<form><input type="submit" class="btn btn-primary" value="Refresh File" name="refresh" /></form>
 			<form action="ajax.php" method="post" >
 				<table class="table table-striped" id="tbl1">
 					<thead>
@@ -64,11 +69,13 @@ foreach($csv_file as $csv) {
 						<th>Status</th>
 						<th>Send</th>	
 					</thead>
+					<?php
 					
-					<?php foreach($csv_file as $csv) {
-						if($i == 0 ) { $i=1;continue;  }
+					$results = mysqli_query($con, "SELECT * FROM accounts"); 
+					while($result = mysqli_fetch_assoc($results)) { 
+					
 						$status = "";
-						 if($csv) {
+						/* if($csv) {
 						 	
 						 	$result = mysqli_query($con, "SELECT preqdate,pchangedate,status FROM accounts WHERE email='$csv[0]'");
 							if($result->num_rows) {
@@ -81,25 +88,25 @@ foreach($csv_file as $csv) {
 							} else {
 								$preqdate = "";
 								$pchangedate = "";
-							}
+							}*/
 					?>
 					<tr>
 					<td>
-						<input type="checkbox" class="check" name="<?php echo $csv[3]; ?>" />
-						<input type="hidden" name="<?php echo $csv[3] ?>-email" value="<?php echo $csv[0] ?>" />
-						<input type="hidden" name="<?php echo $csv[3] ?>-pass" value="<?php echo $csv[5] ?>"  />
+						<input type="checkbox" class="check" name="<?php echo $result['username']; ?>" />
+						<input type="hidden" name="<?php echo $result['email'] ?>-email" value="<?php echo $result['email'] ?>" />
+						<input type="hidden" name="<?php echo $csv['password'] ?>-pass" value="<?php echo $result['password'] ?>"  />
 						<!--<input type="hidden" name="<?php echo $csv[0] ?>-email" value="<?php echo $csv[0] ?>" />
 						<input type="hidden" name="<?php echo $csv[5] ?>-pass" value="<?php echo $csv[5] ?>"  />-->
 					</td>
-					<td><?php echo $csv[0]; ?></td>
-					<td><?php echo $csv[3]; ?> </td>
+					<td><?php echo $result['email']; ?></td>
+					<td><?php echo $result['username']; ?> </td>
 					<!--<td style="display:none"><?php echo $csv ?></td>-->
-					<td><?php echo $preqdate; ?></td>
-					<td><?php echo $pchangedate; ?></td>	
-					<td style="background-color:<?php if($status == "1") echo '#FFFF70'; else if($status == "0") echo '#8BD68B'  ?>" >
-						<?php if($status == "1") {
+					<td><?php echo $result['preqdate']; ?></td>
+					<td><?php echo $result['pchangedate'] ?></td>	
+					<td style="background-color:<?php if($result['status'] == "1") echo '#FFFF70'; else if($result['status'] == "0") echo '#8BD68B'  ?>" >
+						<?php if($result['status'] == "1") {
 							echo "Request Send";
-						} else if($status == "0")  {
+						} else if($result['status'] == "0")  {
 							echo "Password Changed";
 						} else {
 							echo "Password Never Changed";
@@ -107,10 +114,10 @@ foreach($csv_file as $csv) {
 					</td>
 					<td style="width:100px;">
 						<input type="button" class="btn btn-primary sendbtn" value="Send" /><img src="assets/images/loading.gif" width="20px" height="20px" class="hide">
-						<input type="hidden" value="<?php echo $csv[5] ?>" />
+						<input type="hidden" value="<?php echo $result['password'] ?>" />
 					</td>
 					</tr>
-					<?php } }?>
+					<?php } ?>
 					</form>
 				</table>
 				

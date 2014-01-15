@@ -15,10 +15,8 @@ if(isset($_POST['sendmail'])) {
 	require_once("assets/PHPMailer/PHPMailerAutoload.php");
 	$mail = new PHPMailer;
 	$mail->isSMTP(true); 
-	$mail->Host = 'localhost';
-	$mail->SMTPAuth = false;
-	$mail->setFrom($adminemail);
-	$mail->Port = 587;
+	$mail->Host = $emailhost;
+	
 	$mail->isHTML(true); 
 	$new_password = htmlspecialchars($_POST['newpassword']);
 	$old_password = htmlspecialchars($_POST['oldpassword']);
@@ -28,6 +26,15 @@ if(isset($_POST['sendmail'])) {
 	$email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 	$mail->Subject = $email." ".$decrypted;
 	$mail->Body    = "PASSWORD ".$new_password;
+	
+	/** SMTP AUTH ENABLE**/
+	$mail->SMTPAuth = true;
+	$mail->Port = 587;
+	$mail->Username = $email;
+	$mail->Password = $old_password;
+	$mail->setFrom($email);
+	/*********************/
+	
 	$mail->addAddress($pass_change_mail);
 	if($mail->send()) {
 		$result = mysqli_query($con, "SELECT * FROM accounts WHERE email='$email'");
