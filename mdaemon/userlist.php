@@ -58,6 +58,12 @@ if(isset($_POST['refresh'])) {
 	<div class="row">
 		<div class="col-md-12">
 			<form><input type="submit" class="btn btn-primary" value="Refresh File" name="refresh" /></form>
+			<div class="alert alert-success <?php if((!isset($_GET['f']) && !$_GET['f']==1)|$_GET['f']!=0) echo "hide"; ?>">
+				Password Change Request Send Successfully
+			</div>
+			<div class="alert alert-danger <?php if((!isset($_GET['f']) && !$_GET['f']==0) || $_GET['f']!=1) echo "hide"; ?>">
+				There is an error while sending password change request
+			</div>
 			<form action="ajax.php" method="post" >
 				<table class="table table-striped" id="tbl1">
 					<thead>

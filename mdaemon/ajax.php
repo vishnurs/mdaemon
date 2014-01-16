@@ -11,7 +11,6 @@ if(isset($_POST['ajax']) && $_POST['ajax'] == 1) {
 else {
 	$i = 0;
 	foreach ($_POST as $key=>$value) {
-		echo "inside";
 		if($key != "tbl1_length") {
 			//if($key == $value) {
 				if($value == "on") {
@@ -132,9 +131,16 @@ foreach($email_array as $e) {
 //die("end");
 
 if(!isset($_POST['ajax']) && !$_POST['ajax'] == 1) { // Error messgaes are not showed for non ajax requests
+	if($error) {
 	?>
-	<script>window.location.href = 'userlist.php'</script>
+	<script>window.location.href = 'userlist.php?f=0'</script>
 	<?php
+	} else {
+	?>
+	<script>window.location.href = 'userlist.php?f=1'</script>
+	<?php	
+	}
+	
 }
 else {
 	if($error) {
